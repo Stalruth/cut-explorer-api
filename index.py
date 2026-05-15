@@ -19,7 +19,7 @@ def error_404(err):
     return {'error': 'File not found.'}, 404
 
 
-@app.route('/<paste>/')
+@app.route('/pastes/<paste>/')
 def paste(paste):
     resp = make_response()
     resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -62,7 +62,7 @@ def paste(paste):
             abort(404)
 
 
-@app.route('/years.json', methods=(['GET']))
+@app.route('/tournaments/years.json', methods=(['GET']))
 def years():
     resp = make_response()
     resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -76,7 +76,7 @@ def years():
 
 
 # TODO: look at this again, we have the relationships set up
-@app.route('/<int:year>/tournaments.json')
+@app.route('/tournaments/<int:year>/tournaments.json')
 def season(year):
     months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
               7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
@@ -113,7 +113,7 @@ def season(year):
     return result
 
 
-@app.route('/current-year.json')
+@app.route('/tournaments/current-year.json')
 def current_season():
     with Session(engine) as session:
         query = select(func.max(SeasonFormat.season))
@@ -145,7 +145,7 @@ def convert_move(move, pokemon):
     return move
 
 
-@app.route('/<int:year>/<slug>.json')
+@app.route('/tournaments/<int:year>/<slug>.json')
 def tournament(year, slug):
     resp = make_response()
     resp.headers['Access-Control-Allow-Origin'] = '*'
