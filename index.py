@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 
-from flask import abort, Flask, make_response, request
+from flask import abort, Flask, make_response, render_template, request
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import NoResultFound
@@ -19,7 +19,26 @@ def error_404(err):
     return {'error': 'File not found.'}, 404
 
 
-@app.route('/pastes/<paste>/')
+@app.route('/pastes/')
+def paste_index():
+    return render_template('index.html')
+
+
+@app.route('/pastes/<paste>')
+def paste_page(paste):
+    with Session(engine) as session:
+        paste_query = (select(Team)
+                       .where(Team.id == paste)
+                       .options(joinedload(Team.pokemon)
+                                .joinedload(TeamPokemon.moves))
+                       .options(joinedload(Team.pokemon)
+                                .joinedload(TeamPokemon.teratype))
+                       .options(joinedload(Team.tour)))
+        result = session.execute(paste_query).unique().one().Team
+        return render_template('paste.html', team=result)
+
+
+@app.route('/pastes/<paste>.json')
 def paste(paste):
     resp = make_response()
     resp.headers['Access-Control-Allow-Origin'] = '*'

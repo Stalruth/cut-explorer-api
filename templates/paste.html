@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{team.name}}'s {{team.tour.name}} Open Team List</title>
+    <link rel="stylesheet" href="/static/mvp.css">
+    <link rel="stylesheet" href="/static/app.css">
+  </head>
+  <body>
+    <main>
+      <h1>{{team.name}}'s {{team.tour.name}} Open Team List</h1>
+      <div class="teamlist">
+        {% for pokemon in team.pokemon %}
+          <p>
+            {{ pokemon.species }}{% if pokemon.item != None %} @ {{ pokemon.item }}{% endif %}</br>
+            Ability: {{ pokemon.ability }}<br>
+            {% if pokemon.teratype != None %}
+              Tera Type: {{ pokemon.teratype.teratype }}<br>
+            {% endif %}
+            {% for move in pokemon.moves %}
+              - {{move.move}}<br>
+            {% endfor %}
+          </p>
+        {% endfor %}
+      </div>
+      <p class="warning">
+        This page is a work in progress - it looks bare right now but will be improved in the coming weeks.<br>
+        - Stuart Rutherford
+      </p>
+    </main>
+  </body>
+</html>

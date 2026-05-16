@@ -1,0 +1,86 @@
+:root {
+  --color-link: #2222ff;
+  --color-accent: #9211ee4f;
+  --color-bg-secondary: #555;
+  --color-text-secondary: #fff;
+  font-size: 1.125rem;
+  --warning-bg: #ffb;
+  --warning-border: #bb0;
+}
+
+button {
+  padding: 0.4rem 0.8rem;
+  margin: 0 0 1rem 0;
+  border: 0;
+}
+
+button.secondary {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+}
+
+footer {
+  padding-top: 0;
+  border-top: 2px solid var(--color-accent);
+}
+
+footer, header, main {
+  width: min(var(--width-content), calc(100% - 2rem));
+}
+
+header {
+  text-align: var(--justify-normal);
+}
+
+nav {
+  margin-bottom: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  border-bottom: 2px solid var(--color-accent);
+}
+
+select {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+@media(prefers-color-scheme: dark) {
+  :root {
+    --color-accent: #9300fc4f;
+    --color-bg: #222;
+    --color-bg-secondary: #ccc;
+    --color-link: #aaaaff;
+    --color-secondary: #e20de9;
+    --color-secondary-accent: #e20de94f;
+    --color-shadow: #bbbbbb20;
+    --color-table: #0097fc;
+    --color-text: #f7f7f7;
+    --color-text-secondary: #333;
+    --warning-bg: #442;
+    --warning-border: #ff0;
+  }
+}
+
+.teamlist {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: space-around;
+}
+
+.blank {
+  display: grid;
+  gap: 0.5rem;
+  justify-content: space-around;
+}
+
+.warning {
+  border: 1px solid;
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+  background-color: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+
+
