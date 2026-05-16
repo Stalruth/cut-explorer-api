@@ -51,9 +51,10 @@ def paste(paste):
                 pokemon_out = {
                         'species': pokemon.species,
                         'ability': pokemon.ability,
-                        'item': pokemon.item,
                         'moves': [m.move for m in pokemon.moves]
                 }
+                if pokemon.item is not None:
+                    pokemon_out['item'] = pokemon.item
                 if pokemon.teratype:
                     pokemon_out['teraType'] = pokemon.teratype.teratype
                 output['team'].append(pokemon_out)
@@ -211,10 +212,11 @@ def tournament(year, slug):
             for pokemon in row.Team.pokemon:
                 mon = {
                     'species': convert_species(pokemon),
-                    'item': pokemon.item,
                     'ability': convert_ability(pokemon),
                     'moves': [convert_move(move_row.move, pokemon) for move_row in pokemon.moves]
                 }
+                if pokemon.item is not None:
+                    mon['item'] = pokemon.item
                 if pokemon.teratype is not None:
                     mon['teraType'] = pokemon.teratype.teratype
                 row_result['team'].append(mon)
