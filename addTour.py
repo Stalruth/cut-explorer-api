@@ -34,7 +34,7 @@ def get_name_slug(season):
         return (f'{season} Pokémon World Championships', 'worlds')
 
     city_name = input('Where was this event held? (City for Reg/Spe, Region for Int) ')
-    return (f'{season} {city_name} {name_suffix}', f"{level}-{re.sub('\\s', '-', city_name.lower())}")
+    return (f'{city_name} {name_suffix}', f"{level}-{re.sub('\\s', '-', city_name.lower())}")
 
 
 engine = get_engine()
