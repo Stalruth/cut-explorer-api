@@ -157,36 +157,26 @@ def tournament(year, slug):
         result['name'] = tour.name
 
         # stages
+        stages = []
         if tour.cut is not None:
-            if tour.day2 is None:
-                result['stages'] = [
-                        {},
-                        {
-                            'count': tour.cut
-                        }
-                ]
-            elif tour.day2 is not None:
-                if tour.day2 > tour.kicker:
-                    result['stages'] = [
-                            {
-                                'name': 'Day 2'
-                            },
-                            {
-                                'name': 'All Points',
-                                'count': tour.kicker
-                            },
-                    ]
-                else:
-                    result['stages'] = [
-                            {},
-                            {
-                                'name': 'Day 2',
-                                'count': tour.day2
-                            }
-                    ]
-                result['stages'].append({
-                    'count': tour.cut
-                })
+            stages.append({
+                'count': tour.cut
+            })
+        if tour.day2 is not None:
+            stages.append({
+                'name': 'Day 2',
+                'count': tour.day2
+            })
+        if tour.kicker != tour.day2 and tour.kicker != tour.cut:
+            stage = {
+                'count': tour.kicker
+            }
+            if tour.kicker < tour.day2:
+                stage['name'] = 'All Points',
+            stages.append(stage)
+
+        result['stages'] = sorted(stages, key=lambda stage: stage['count'])[::-1]
+        result['stages'][0].pop('count', None)
 
         # teams
         teams_query = select(Team).where(Team.tour_id == tour.id).order_by(Team.place).options(joinedload(Team.pokemon).joinedload(TeamPokemon.moves)).options(joinedload(Team.pokemon).joinedload(TeamPokemon.teratype))
