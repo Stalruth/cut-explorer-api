@@ -154,7 +154,7 @@ def tournament(year, slug):
     with Session(engine) as session:
         tour_query = select(Tournament).where(Tournament.season == year).where(Tournament.slug == slug)
         tour = session.execute(tour_query).one().Tournament
-        result['name'] = tour.name
+        result['name'] = tour.name if tour.name.startswith(f'{tour.season}') else f'{tour.season} {tour.name}'
 
         # stages
         stages = []
