@@ -40,7 +40,7 @@ class SeasonFormat(Base):
     start_date: Mapped[date]
     end_date: Mapped[date]
     format: Mapped[Format] = relationship(back_populates='season_formats')
-    tournaments: Mapped[List['Tournament']] = relationship(back_populates='season_format')
+    tournaments: Mapped[List['Tournament']] = relationship(back_populates='season_format', order_by='Tournament.id')
 
 
 class Tournament(Base):
