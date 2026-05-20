@@ -171,7 +171,7 @@ def tournament(year, slug):
             stage = {
                 'count': tour.kicker
             }
-            if tour.kicker < tour.day2:
+            if tour.day2 is None or tour.kicker < tour.day2:
                 stage['name'] = 'All Points',
             stages.append(stage)
 
