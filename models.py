@@ -27,9 +27,10 @@ class Format(Base):
     id = mapped_column(Text, primary_key=True)
     name: Mapped[str]
     gscup: Mapped[bool]
-    megaevolution: Mapped[bool]
+    mega_evolution: Mapped[bool]
     terastal: Mapped[bool]
     season_formats: Mapped[List['SeasonFormat']] = relationship(back_populates='format')
+    open_natures: Mapped[bool]
 
 
 class SeasonFormat(Base):

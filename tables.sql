@@ -2,8 +2,9 @@ CREATE TABLE format(
   id text PRIMARY KEY,
   name text NOT NULL,
   gscup boolean NOT NULL,
-  megaevolution boolean NOT NULL,
-  terastal boolean NOT NULL
+  mega_evolution boolean NOT NULL,
+  terastal boolean NOT NULL,
+  open_natures boolean NOT NULL
 );
 
 CREATE TABLE season_formats(
@@ -54,6 +55,11 @@ CREATE TABLE pokemon_moves(
 CREATE TABLE pokemon_teratypes(
   pokemon_id integer PRIMARY KEY,
   teratype text NOT NULL
+);
+
+CREATE TABLE pokemon_natures(
+  pokemon_id integer PRIMARY KEY,
+  nature text NOT NULL
 );
 
 -- copy from existing CSVs generated from the top cut explorer...
