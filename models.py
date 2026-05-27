@@ -81,7 +81,7 @@ class TeamPokemon(Base):
     item: Mapped[Optional[str]]
     ability: Mapped[str]
     teratype: Mapped[Optional['PokemonTeratypes']] = relationship(back_populates='pokemon', cascade='all, delete')
-    nature: Mapped[Optional['PokemoNNatures']] = relationship(back_populates='pokemon', cascade='all, delete')
+    nature: Mapped[Optional['PokemonNatures']] = relationship(back_populates='pokemon', cascade='all, delete')
     moves: Mapped[List['PokemonMoves']] = relationship(back_populates='pokemon', cascade='all, delete', order_by='PokemonMoves.id')
     team: Mapped[Team] = relationship(back_populates='pokemon')
 
