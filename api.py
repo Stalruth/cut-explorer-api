@@ -208,6 +208,8 @@ def tournament(year, slug):
                     mon['item'] = pokemon.item
                 if pokemon.teratype is not None:
                     mon['teraType'] = pokemon.teratype.teratype
+                if pokemon.nature is not None:
+                    mon['nature'] = pokemon.nature.nature
                 row_result['team'].append(mon)
             result['teams'].append(row_result)
     return result
