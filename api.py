@@ -227,7 +227,6 @@ def tournament(year, slug):
         for row in rows:
             row_result = {
                     'name': row.Team.name,
-                    'paste': row.Team.paste,
                     'id': row.Team.id,
                     'swiss': {
                         'wins': row.Team.wins,
