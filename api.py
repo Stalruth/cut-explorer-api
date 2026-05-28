@@ -121,28 +121,48 @@ def current_season():
         return season(result)
 
 
-def convert_species(pokemon):
+def convert_set(pokemon):
+    pokemon_out = {
+            'species': pokemon.species,
+            'ability': pokemon.ability,
+            'moves': [m.move for move in pokemon.moves]
+    }
+
+    if pokemon.item is not None:
+        pokemon_out['item'] = pokemon.item
+    else:
+        pokemon_out['item'] = ''
+
+    if pokemon.teratype is not None:
+        pokemon_out['teraType'] = pokemon.teratype.teratype
+
+    if pokemon.nature is not None:
+        pokemon_out['nature'] = pokemon.nature.nature
+
+    # Zacian
     if pokemon.species == 'Zacian' and pokemon.item == 'Rusted Sword':
-        return 'Zacian-Crowned'
+        pokemon_out['species'] = 'Zacian-Crowned'
+        pokemon_out['moves'] = ['Behemoth Blade' if m.move == 'Iron Head' else m.move for move in pokemon.moves]
+
+    # Zamazenta
     if pokemon.species == 'Zamazenta' and pokemon.item == 'Rusted Shield':
-        return 'Zamazenta-Crowned'
+        pokemon_out['species'] = 'Zamazenta-Crowned'
+        pokemon_out['moves'] = ['Behemoth Bash' if m.move == 'Iron Head' else m.move for move in pokemon.moves]
+
+    # Terapagos
     if pokemon.species == 'Terapagos':
-        return 'Terapagos-Terastal'
-    return pokemon.species
+        pokemon_out['species'] = 'Terapagos-Terastal'
+        pokemon_out['abiilty'] = 'Tera Shell'
 
+    # TODO: Megas
+    if pokemon.species in megas:
+        mega = megas[pokemon.species]
+        if 'item' in mega and mega['item'] = pokemon.item:
+            pokemon.species = mega['mega']
+        elif 'move' in mega and mega['move'] in pokemon_out['moves']:
+            pokemon.species = mega['mega']
 
-def convert_ability(pokemon):
-    if pokemon.species == 'Terapagos':
-        return 'Tera Shell'
-    return pokemon.ability
-
-
-def convert_move(move, pokemon):
-    if pokemon.species == 'Zacian' and pokemon.item == 'Rusted Sword' and move == 'Iron Head':
-        return 'Behemoth Blade'
-    if pokemon.species == 'Zamazenta' and pokemon.item == 'Rusted Shield' and move == 'Iron Head':
-        return 'Behemoth Bash'
-    return move
+    return pokemon_out
 
 
 @app.route('/tournaments/<int:year>/<slug>.json')
@@ -233,25 +253,13 @@ def tournament(year, slug):
                         'losses': row.Team.losses,
                         'place': row.Team.place
                     },
-                    'team': []
             }
             if row.Team.top:
                 row_result['top'] = row.Team.top
             if row.Team.ties:
                 row_result['swiss']['ties'] = row.Team.ties
-            for pokemon in row.Team.pokemon:
-                mon = {
-                    'species': convert_species(pokemon),
-                    'ability': convert_ability(pokemon),
-                    'moves': [convert_move(move_row.move, pokemon) for move_row in pokemon.moves]
-                }
-                if pokemon.item is not None:
-                    mon['item'] = pokemon.item
-                if pokemon.teratype is not None:
-                    mon['teraType'] = pokemon.teratype.teratype
-                if pokemon.nature is not None:
-                    mon['nature'] = pokemon.nature.nature
-                row_result['team'].append(mon)
+            row_result['team'] = [convert_set(pokemon) for pokemon in row.Team.pokemon]
+
             result['teams'].append(row_result)
     return result
 
