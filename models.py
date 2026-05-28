@@ -106,3 +106,17 @@ class PokemonNatures(Base):
     nature = Mapped[str]
     pokemon: Mapped[TeamPokemon] = relationship(back_populates='nature')
 
+
+class SpecialPokemon(Base):
+    __tablename__='special_pokemon'
+    species = mapped_column(Text, primary_key=True)
+    is_mythical: Mapped[bool]
+
+
+# TODO: Mega Rayquaza
+class MegaPokemon(Base):
+    __tablename__='mega_pokemon'
+    species = mapped_column(Text, primary_key=True)
+    item = mapped_column(Text, primary_key=True)
+    placeholder: Mapped[bool]
+

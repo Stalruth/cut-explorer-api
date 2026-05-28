@@ -62,6 +62,18 @@ CREATE TABLE pokemon_natures(
   nature text NOT NULL
 );
 
+CREATE TABLE special_pokemon(
+  species text PRIMARY KEY,
+  is_mythical boolean NOT NULL
+);
+
+CREATE TABLE mega_pokemon(
+  species text NOT NULL,
+  item text NOT NULL,
+  placeholder boolean NOT NULL,
+  PRIMARY KEY (species, item)
+);
+
 -- copy from existing CSVs generated from the top cut explorer...
 -- COPY format FROM '/tmp/tmp.pvzDvQzQ1g/format.csv' WITH (FORMAT csv, HEADER true);
 -- COPY season_formats FROM '/tmp/tmp.pvzDvQzQ1g/season_formats.csv' WITH (FORMAT csv, HEADER true);

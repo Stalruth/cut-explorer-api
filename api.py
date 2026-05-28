@@ -5,7 +5,8 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import contains_eager, joinedload, Session
 
-from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures
+from megas import megas
+from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures, SpecialPokemon, MegaPokemon
 
 app = Flask(__name__)
 
@@ -203,6 +204,22 @@ def tournament(year, slug):
             teams_query = (teams_query.join(TeamPokemon.nature)
                            .options(contains_eager(Team.pokemon)
                                     .contains_eager(TeamPokemon.nature))
+                           )
+
+        # TODO: Mega Rayquaza
+        if tour_format.mega_evolution:
+            teams.query = (teams_query
+                           .outerjoin(MegaPokemon,
+                                      TeamPokemon.species == MegaPokemon.species,
+                                      TeamPokemon.item == MegaPokemon.item)
+                           .orderby(MegaPokemon.placeholder)
+                           )
+
+        if tour_format.gscup:
+            teams_query = (teams_query
+                           .outerjoin(SpecialPokemon,
+                                      TeamPokemon.species == SpecialPokemon.species)
+                           .order_by(SpecialPokemon.is_mythical)
                            )
 
         print(teams_query)
