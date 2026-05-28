@@ -17,6 +17,9 @@
             {% if pokemon.teratype != None %}
               Tera Type: {{ pokemon.teratype.teratype }}<br>
             {% endif %}
+            {% if pokemon.nature != None %}
+              {{ pokemon.nature.nature }} Nature<br>
+            {% endif %}
             {% for move in pokemon.moves %}
               - {{move.move}}<br>
             {% endfor %}

@@ -78,6 +78,7 @@ ALTER TABLE team ADD FOREIGN KEY (tour_id) REFERENCES tournament ON DELETE CASCA
 ALTER TABLE team_pokemon ADD FOREIGN KEY (team_id) REFERENCES team(id) ON DELETE CASCADE;
 ALTER TABLE pokemon_moves ADD FOREIGN KEY (pokemon_id) REFERENCES team_pokemon ON DELETE CASCADE;
 ALTER TABLE pokemon_teratypes ADD FOREIGN KEY (pokemon_id) REFERENCES team_pokemon ON DELETE CASCADE;
+ALTER TABLE pokemon_natures ADD FOREIGN KEY (pokemon_id) REFERENCES team_pokemon ON DELETE CASCADE;
 
 SELECT setval('season_formats_id_seq', (SELECT MAX(id) FROM season_formats));
 SELECT setval('tournament_id_seq', (SELECT MAX(id) FROM tournament));

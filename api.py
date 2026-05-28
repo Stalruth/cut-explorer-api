@@ -3,9 +3,9 @@ from flask import abort, Flask, make_response, render_template, request
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import joinedload, Session
+from sqlalchemy.orm import contains_eager, joinedload, Session
 
-from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves
+from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures
 
 app = Flask(__name__)
 
@@ -152,8 +152,14 @@ def tournament(year, slug):
             'teams': []
     }
     with Session(engine) as session:
-        tour_query = select(Tournament).where(Tournament.season == year).where(Tournament.slug == slug)
+        tour_query = (select(Tournament)
+                      .where(Tournament.season == year)
+                      .where(Tournament.slug == slug)
+                      .options(joinedload(Tournament.season_format)
+                               .joinedload(SeasonFormat.format))
+                      )
         tour = session.execute(tour_query).one().Tournament
+        tour_format = tour.season_format.format
         result['name'] = tour.name if tour.name.startswith(f'{tour.season}') else f'{tour.season} {tour.name}'
 
         # stages
@@ -178,8 +184,27 @@ def tournament(year, slug):
         result['stages'] = sorted(stages, key=lambda stage: stage['count'])[::-1]
         result['stages'][0].pop('count', None)
 
-        # teams
-        teams_query = select(Team).where(Team.tour_id == tour.id).order_by(Team.place).options(joinedload(Team.pokemon).joinedload(TeamPokemon.moves)).options(joinedload(Team.pokemon).joinedload(TeamPokemon.teratype))
+        teams_query = (select(Team)
+                       .where(Team.tour_id == tour.id)
+                       .join(Team.pokemon)
+                       .join(TeamPokemon.moves)
+                       .options(contains_eager(Team.pokemon)
+                                .contains_eager(TeamPokemon.moves))
+                       .order_by(Team.place)
+                       )
+
+        if tour_format.terastal:
+            teams_query = (teams_query.join(TeamPokemon.teratype)
+                           .options(contains_eager(Team.pokemon)
+                                    .contains_eager(TeamPokemon.teratype))
+                           )
+
+        if tour_format.open_natures:
+            teams_query = (teams_query.join(TeamPokemon.nature)
+                           .options(contains_eager(Team.pokemon)
+                                    .contains_eager(TeamPokemon.nature))
+                           )
+
         print(teams_query)
         rows = session.execute(teams_query).unique()
         for row in rows:

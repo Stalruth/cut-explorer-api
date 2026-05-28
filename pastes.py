@@ -30,7 +30,10 @@ def paste_page(paste):
                                 .joinedload(TeamPokemon.moves))
                        .options(joinedload(Team.pokemon)
                                 .joinedload(TeamPokemon.teratype))
-                       .options(joinedload(Team.tour)))
+                       .options(joinedload(Team.pokemon)
+                                .joinedload(TeamPokemon.nature))
+                       .options(joinedload(Team.tour))
+                       )
         result = session.execute(paste_query).unique().one().Team
         return render_template('paste.html', team=result)
 
