@@ -142,12 +142,12 @@ def convert_set(pokemon):
     # Zacian
     if pokemon.species == 'Zacian' and pokemon.item == 'Rusted Sword':
         pokemon_out['species'] = 'Zacian-Crowned'
-        pokemon_out['moves'] = ['Behemoth Blade' if m.move == 'Iron Head' else m.move for move in pokemon.moves]
+        pokemon_out['moves'] = ['Behemoth Blade' if m.move == 'Iron Head' else m.move for m in pokemon.moves]
 
     # Zamazenta
     if pokemon.species == 'Zamazenta' and pokemon.item == 'Rusted Shield':
         pokemon_out['species'] = 'Zamazenta-Crowned'
-        pokemon_out['moves'] = ['Behemoth Bash' if m.move == 'Iron Head' else m.move for move in pokemon.moves]
+        pokemon_out['moves'] = ['Behemoth Bash' if m.move == 'Iron Head' else m.move for m in pokemon.moves]
 
     # Terapagos
     if pokemon.species == 'Terapagos':
