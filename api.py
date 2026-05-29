@@ -121,7 +121,7 @@ def current_season():
         return season(result)
 
 
-def convert_set(pokemon):
+def convert_set(pokemon, tour_format):
     pokemon_out = {
             'species': pokemon.species,
             'ability': pokemon.ability,
@@ -155,12 +155,12 @@ def convert_set(pokemon):
         pokemon_out['abiilty'] = 'Tera Shell'
 
     # TODO: Megas
-    if pokemon.species in megas:
+    if tour_format.mega_evolution and pokemon.species in megas:
         mega = megas[pokemon.species]
         if 'item' in mega and mega['item'] == pokemon.item:
-            pokemon.species = mega['mega']
+            pokemon_out['species'] = mega['mega']
         elif 'move' in mega and mega['move'] in pokemon_out['moves']:
-            pokemon.species = mega['mega']
+            pokemon_out['species'] = mega['mega']
 
     return pokemon_out
 
@@ -267,7 +267,7 @@ def tournament(year, slug):
                 row_result['top'] = row.Team.top
             if row.Team.ties:
                 row_result['swiss']['ties'] = row.Team.ties
-            row_result['team'] = [convert_set(pokemon) for pokemon in row.Team.pokemon]
+            row_result['team'] = [convert_set(pokemon, tour_format) for pokemon in row.Team.pokemon]
 
             result['teams'].append(row_result)
     return result
