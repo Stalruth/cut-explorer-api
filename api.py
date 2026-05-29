@@ -125,7 +125,7 @@ def convert_set(pokemon):
     pokemon_out = {
             'species': pokemon.species,
             'ability': pokemon.ability,
-            'moves': [m.move for move in pokemon.moves]
+            'moves': [m.move for m in pokemon.moves]
     }
 
     if pokemon.item is not None:
@@ -157,7 +157,7 @@ def convert_set(pokemon):
     # TODO: Megas
     if pokemon.species in megas:
         mega = megas[pokemon.species]
-        if 'item' in mega and mega['item'] = pokemon.item:
+        if 'item' in mega and mega['item'] == pokemon.item:
             pokemon.species = mega['mega']
         elif 'move' in mega and mega['move'] in pokemon_out['moves']:
             pokemon.species = mega['mega']
@@ -187,10 +187,10 @@ def tournament(year, slug):
         result['fields'] = ['species', 'ability', 'item', 'moves']
 
         if tour_format.terastal:
-            result['fields']['single'].append('teraType')
+            result['fields'].append('teraType')
 
         if tour_format.open_natures:
-            result['fields']['single'].append('nature')
+            result['fields'].append('nature')
 
         # stages
         stages = []
