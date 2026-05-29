@@ -133,10 +133,10 @@ def convert_set(pokemon, tour_format):
     else:
         pokemon_out['item'] = ''
 
-    if pokemon.teratype is not None:
+    if tour_format.terastal == True:
         pokemon_out['teraType'] = pokemon.teratype.teratype
 
-    if pokemon.nature is not None:
+    if tour_format.open_natures == True:
         pokemon_out['nature'] = pokemon.nature.nature
 
     # Zacian
