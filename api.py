@@ -180,8 +180,17 @@ def tournament(year, slug):
                                .joinedload(SeasonFormat.format))
                       )
         tour = session.execute(tour_query).one().Tournament
-        tour_format = tour.season_format.format
         result['name'] = tour.name if tour.name.startswith(f'{tour.season}') else f'{tour.season} {tour.name}'
+
+        # format
+        tour_format = tour.season_format.format
+        result['fields'] = ['species', 'ability', 'item', 'moves']
+
+        if tour_format.terastal:
+            result['fields']['single'].append('teraType')
+
+        if tour_format.open_natures:
+            result['fields']['single'].append('nature')
 
         # stages
         stages = []
