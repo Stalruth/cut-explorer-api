@@ -70,6 +70,23 @@ select {
   justify-content: space-around;
 }
 
+.set-display {
+  display: flex;
+}
+
+.set-icons {
+  margin: 0.75rem 0;
+}
+
+.set-icon {
+  display: inline-block;
+  width: 40px;
+  height: 30px;
+  image-rendering: pixelated;
+  background: transparent url('/static/pokemonicons-sheet.png') no-repeat scroll;
+  vertical-align: bottom;
+}
+
 .blank {
   display: grid;
   gap: 0.5rem;
