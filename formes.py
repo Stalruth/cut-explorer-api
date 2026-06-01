@@ -21,7 +21,7 @@ formes = {
         "Enamorus [Incarnate Forme]": "Enamorus",
         "Enamorus [Therian Forme]": "Enamorus-Therian",
         "Exeggutor [Alolan Form]": "Exeggutor-Alola",
-        "Floette": "Floette-Eternal",
+        "Floette [Eternal Flower]": "Floette-Eternal",
         "Geodude [Alolan Form]": "Geodude-Alola",
         "Gimmighoul [Chest Form]": "Gimmighoul",
         "Gimmighoul [Roaming Form]": "Gimmighoul-Roaming",
