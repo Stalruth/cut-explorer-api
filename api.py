@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from flask import abort, Flask, make_response, render_template, request
 
-from sqlalchemy import func, select
+from sqlalchemy import func, nullslast, select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import contains_eager, joinedload, Session
 
-from megas import megas
+import megas
 from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures, SpecialPokemon, MegaPokemon
 
 app = Flask(__name__)
@@ -155,12 +155,14 @@ def convert_set(pokemon, tour_format):
         pokemon_out['abiilty'] = 'Tera Shell'
 
     # TODO: Megas
-    if tour_format.mega_evolution and pokemon.species in megas:
-        mega = megas[pokemon.species]
-        if 'item' in mega and mega['item'] == pokemon.item:
+    if tour_format.mega_evolution and pokemon.item in megas.stones:
+        mega = megas.stones[pokemon.item]
+        if mega['species'] == pokemon.species:
             pokemon_out['species'] = mega['mega']
-        elif 'move' in mega and mega['move'] in pokemon_out['moves']:
-            pokemon_out['species'] = mega['mega']
+
+    # TODO: rayquaza
+    #elif 'move' in mega and mega['move'] in pokemon_out['moves']:
+    #    pokemon_out['species'] = mega['mega']
 
     return pokemon_out
 
@@ -239,8 +241,9 @@ def tournament(year, slug):
         if tour_format.mega_evolution:
             teams_query = (teams_query
                            .outerjoin(MegaPokemon,
-                                      (TeamPokemon.species == MegaPokemon.species) & (TeamPokemon.item == MegaPokemon.item))
-                           .order_by(MegaPokemon.placeholder)
+                                      (TeamPokemon.species == MegaPokemon.species)
+                                      & (TeamPokemon.item == MegaPokemon.item))
+                           .order_by(nullslast(MegaPokemon.placeholder))
                            )
 
         if tour_format.gscup:
@@ -266,6 +269,7 @@ def tournament(year, slug):
                 row_result['top'] = row.Team.top
             if row.Team.ties:
                 row_result['swiss']['ties'] = row.Team.ties
+            print(tour_format.mega_evolution)
             row_result['team'] = [convert_set(pokemon, tour_format) for pokemon in row.Team.pokemon]
 
             result['teams'].append(row_result)
