@@ -237,11 +237,10 @@ def tournament(year, slug):
 
         # TODO: Mega Rayquaza
         if tour_format.mega_evolution:
-            teams.query = (teams_query
+            teams_query = (teams_query
                            .outerjoin(MegaPokemon,
-                                      TeamPokemon.species == MegaPokemon.species,
-                                      TeamPokemon.item == MegaPokemon.item)
-                           .orderby(MegaPokemon.placeholder)
+                                      (TeamPokemon.species == MegaPokemon.species) & (TeamPokemon.item == MegaPokemon.item))
+                           .order_by(MegaPokemon.placeholder)
                            )
 
         if tour_format.gscup:

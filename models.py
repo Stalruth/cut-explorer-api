@@ -103,7 +103,7 @@ class PokemonMoves(Base):
 class PokemonNatures(Base):
     __tablename__='pokemon_natures'
     pokemon_id = mapped_column(ForeignKey('team_pokemon.id'), primary_key=True)
-    nature = Mapped[str]
+    nature: Mapped[str]
     pokemon: Mapped[TeamPokemon] = relationship(back_populates='nature')
 
 
