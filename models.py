@@ -14,7 +14,8 @@ def get_engine():
     with open(os.environ['DB_PASS'], 'r') as infile:
         password = infile.read().strip()
     return create_engine(
-            f'postgresql+psycopg://{os.environ["DB_USER"]}:{password}@localhost/{os.environ["DB_NAME"]}'
+            f'postgresql+psycopg://{os.environ["DB_USER"]}:{password}@localhost/{os.environ["DB_NAME"]}',
+            echo=os.environ.get('DB_DEBUG', False) != False
     )
 
 

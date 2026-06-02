@@ -3,10 +3,10 @@ from flask import abort, Flask, make_response, render_template, request
 
 from sqlalchemy import func, nullslast, select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import contains_eager, joinedload, Session
+from sqlalchemy.orm import joinedload, Session
 
 import megas
-from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures, SpecialPokemon, MegaPokemon
+from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures
 
 app = Flask(__name__)
 
@@ -154,15 +154,18 @@ def convert_set(pokemon, tour_format):
         pokemon_out['species'] = 'Terapagos-Terastal'
         pokemon_out['abiilty'] = 'Tera Shell'
 
-    # TODO: Megas
-    if tour_format.mega_evolution and pokemon.item in megas.stones:
-        mega = megas.stones[pokemon.item]
-        if mega['species'] == pokemon.species:
-            pokemon_out['species'] = mega['mega']
-
-    # TODO: rayquaza
-    #elif 'move' in mega and mega['move'] in pokemon_out['moves']:
-    #    pokemon_out['species'] = mega['mega']
+    # Megas
+    if tour_format.mega_evolution:
+        if pokemon.item in megas.stones:
+            mega = megas.stones[pokemon.item]
+            if mega['species'] == pokemon.species:
+                pokemon_out['species'] = mega['mega']
+        # TODO: test when mray becomes legal
+        #else:
+        #    for move_row in pokemon.moves:
+        #        move = move_row.move
+        #        if move in megas.moves and pokemon.species == megas.moves[move]['species']:
+        #            pokemon_out['species'] = mega['mega']
 
     return pokemon_out
 
@@ -218,42 +221,23 @@ def tournament(year, slug):
 
         teams_query = (select(Team)
                        .where(Team.tour_id == tour.id)
-                       .join(Team.pokemon)
-                       .join(TeamPokemon.moves)
-                       .options(contains_eager(Team.pokemon)
-                                .contains_eager(TeamPokemon.moves))
+                       .options(joinedload(Team.pokemon)
+                                .joinedload(TeamPokemon.moves))
                        .order_by(Team.place)
                        )
 
         if tour_format.terastal:
-            teams_query = (teams_query.join(TeamPokemon.teratype)
-                           .options(contains_eager(Team.pokemon)
-                                    .contains_eager(TeamPokemon.teratype))
+            teams_query = (teams_query
+                           .options(joinedload(Team.pokemon)
+                                    .joinedload(TeamPokemon.teratype))
                            )
 
         if tour_format.open_natures:
-            teams_query = (teams_query.join(TeamPokemon.nature)
-                           .options(contains_eager(Team.pokemon)
-                                    .contains_eager(TeamPokemon.nature))
-                           )
-
-        # TODO: Mega Rayquaza
-        if tour_format.mega_evolution:
             teams_query = (teams_query
-                           .outerjoin(MegaPokemon,
-                                      (TeamPokemon.species == MegaPokemon.species)
-                                      & (TeamPokemon.item == MegaPokemon.item))
-                           .order_by(nullslast(MegaPokemon.placeholder))
+                           .options(joinedload(Team.pokemon)
+                                    .joinedload(TeamPokemon.nature))
                            )
 
-        if tour_format.gscup:
-            teams_query = (teams_query
-                           .outerjoin(SpecialPokemon,
-                                      TeamPokemon.species == SpecialPokemon.species)
-                           .order_by(SpecialPokemon.is_mythical)
-                           )
-
-        print(teams_query)
         rows = session.execute(teams_query).unique()
         for row in rows:
             row_result = {
@@ -269,7 +253,6 @@ def tournament(year, slug):
                 row_result['top'] = row.Team.top
             if row.Team.ties:
                 row_result['swiss']['ties'] = row.Team.ties
-            print(tour_format.mega_evolution)
             row_result['team'] = [convert_set(pokemon, tour_format) for pokemon in row.Team.pokemon]
 
             result['teams'].append(row_result)
