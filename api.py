@@ -227,11 +227,10 @@ def convert_set(pokemon, tour_format):
 
 @app.route('/tournaments/<int:year>/<slug>.json')
 def tournament(year, slug):
-    resp = make_response()
-    resp.headers['Access-Control-Allow-Origin'] = '*'
     result = {
             'teams': []
     }
+    last_modified = None
     with Session(engine) as session:
         tour_query = (select(Tournament)
                       .where(Tournament.season == year)
@@ -240,10 +239,8 @@ def tournament(year, slug):
                                .joinedload(SeasonFormat.format))
                       )
         tour = session.execute(tour_query).one().Tournament
-        if request.if_modified_since is not None and request.if_modified_since < tour.last_modified:
-            return '', 304
 
-        resp.last_modified = tour.last_modified
+        last_modified = tour.last_modified
         result['name'] = tour.name if tour.name.startswith(f'{tour.season}') else f'{tour.season} {tour.name}'
 
         # format
@@ -315,5 +312,14 @@ def tournament(year, slug):
             row_result['team'] = [convert_set(pokemon, tour_format) for pokemon in row.Team.pokemon]
 
             result['teams'].append(row_result)
-    return result
+    if request.if_modified_since is not None and request.if_modified_since > last_modified:
+        resp = make_response('', 304)
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.last_modified = last_modified
+        return resp
+    else:
+        resp = make_response(result)
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.last_modified = last_modified
+        return resp
 
