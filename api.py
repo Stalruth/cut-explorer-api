@@ -41,8 +41,6 @@ def set_icon(pokemon):
     top = -math.floor(num / 12) * 30
     left = -(num % 12) * 40
 
-    print(pokemon.species, species_id, num, left, top)
-
     return Markup(f'<span title="{pokemon.species}" style="background-position: {left}px {top}px" class="set-icon"></span>')
 
 
