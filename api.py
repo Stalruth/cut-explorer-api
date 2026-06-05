@@ -50,6 +50,7 @@ def error_404(err):
 
 
 @app.route('/')
+@app.route('/pastes/')
 def paste_index():
     return render_template('index.html')
 
