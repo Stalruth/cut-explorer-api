@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import uuid
 import os
 
@@ -55,6 +55,7 @@ class Tournament(Base):
     kicker: Mapped[int]
     day2: Mapped[Optional[int]]
     cut: Mapped[Optional[int]]
+    last_modified: Mapped[datetime]
     season_format: Mapped[SeasonFormat] = relationship(back_populates='tournaments')
     teams: Mapped[List["Team"]] = relationship(back_populates='tour', cascade='all, delete')
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from datetime import datetime
 import json
 import math
 import re
@@ -239,6 +240,10 @@ def tournament(year, slug):
                                .joinedload(SeasonFormat.format))
                       )
         tour = session.execute(tour_query).one().Tournament
+        if request.if_modified_since is not None and request.if_modified_since < tour.last_modified:
+            return '', 304
+
+        resp.last_modified = tour.last_modified
         result['name'] = tour.name if tour.name.startswith(f'{tour.season}') else f'{tour.season} {tour.name}'
 
         # format
