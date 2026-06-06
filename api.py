@@ -77,7 +77,6 @@ def paste_page(paste):
 @app.route('/pastes/<paste>.json')
 def paste(paste):
     resp = make_response()
-    resp.headers['Access-Control-Allow-Origin'] = '*'
     with Session(engine) as session:
         paste_query = (select(Team)
                        .where(Team.id == paste)
@@ -121,7 +120,6 @@ def paste(paste):
 @app.route('/tournaments/years.json', methods=(['GET']))
 def years():
     resp = make_response()
-    resp.headers['Access-Control-Allow-Origin'] = '*'
     result = []
     with Session(engine) as session:
         query = select(SeasonFormat.season).group_by('season').order_by('season')
@@ -137,7 +135,6 @@ def season(year):
     months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
               7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
     resp = make_response()
-    resp.headers['Access-Control-Allow-Origin'] = '*'
     result = {
             'season': f'{year}',
             'formats': []
@@ -244,7 +241,6 @@ def tournament(year, slug):
         last_modified = tour.last_modified.replace(tzinfo=ZoneInfo('UTC'))
         if request.if_modified_since is not None and request.if_modified_since > last_modified:
             resp = make_response('', 304)
-            resp.headers['Access-Control-Allow-Origin'] = '*'
             resp.last_modified = last_modified
             return resp
 
@@ -321,7 +317,6 @@ def tournament(year, slug):
             result['teams'].append(row_result)
 
     resp = make_response(result)
-    resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.last_modified = last_modified
     return resp
 
