@@ -140,6 +140,12 @@ def season(year):
             'formats': []
     }
     with Session(engine) as session:
+        last_query = select(func.max(Tournament.last_modified)).where(Tournament.season == year)
+        last_modified = session.execute(last_query).scalars().first().replace(tzinfo=ZoneInfo('UTC'))
+        if request.if_modified_since is not None and request.if_modified_since > last_modified:
+            resp = make_response('', 304)
+            resp.last_modified = last_modified
+            return resp
         formats_query = select(SeasonFormat, Format).join(SeasonFormat.format).where(SeasonFormat.season == year).order_by(SeasonFormat.start_date)
         rows = session.execute(formats_query)
         for row in rows:
