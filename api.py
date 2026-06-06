@@ -242,6 +242,12 @@ def tournament(year, slug):
         tour = session.execute(tour_query).one().Tournament
 
         last_modified = tour.last_modified.replace(tzinfo=ZoneInfo('UTC'))
+        if request.if_modified_since is not None and request.if_modified_since > last_modified:
+            resp = make_response('', 304)
+            resp.headers['Access-Control-Allow-Origin'] = '*'
+            resp.last_modified = last_modified
+            return resp
+
         result['name'] = tour.name if tour.name.startswith(f'{tour.season}') else f'{tour.season} {tour.name}'
 
         # format
@@ -314,12 +320,8 @@ def tournament(year, slug):
 
             result['teams'].append(row_result)
 
-    if request.if_modified_since is not None and request.if_modified_since > last_modified:
-        resp = make_response('', 304)
-    else:
-        resp = make_response(result)
+    resp = make_response(result)
     resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.last_modified = last_modified
-    print(resp.last_modified)
     return resp
 
