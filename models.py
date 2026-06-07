@@ -105,8 +105,9 @@ class PokemonMoves(Base):
 class PokemonNatures(Base):
     __tablename__='pokemon_natures'
     pokemon_id = mapped_column(ForeignKey('team_pokemon.id'), primary_key=True)
-    nature: Mapped[str]
+    nature: Mapped[str] = mapped_column(ForeignKey('natures.nature'))
     pokemon: Mapped[TeamPokemon] = relationship(back_populates='nature')
+    stats: Mapped['Natures'] = relationship()
 
 
 class SpecialPokemon(Base):
@@ -121,4 +122,10 @@ class MegaPokemon(Base):
     species = mapped_column(Text, primary_key=True)
     item = mapped_column(Text, primary_key=True)
     placeholder: Mapped[bool]
+
+class Natures(Base):
+    __tablename__='natures'
+    nature: Mapped[str] = mapped_column(primary_key=True)
+    boosted: Mapped[str]
+    lowered: Mapped[str]
 

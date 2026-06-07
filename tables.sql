@@ -23,7 +23,8 @@ CREATE TABLE tournament(
   name text NOT NULL,
   kicker integer NOT NULL,
   day2 integer,
-  cut integer
+  cut integer,
+  last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
 );
 
 CREATE TABLE team(
@@ -72,6 +73,12 @@ CREATE TABLE mega_pokemon(
   item text NOT NULL,
   placeholder boolean NOT NULL,
   PRIMARY KEY (species, item)
+);
+
+CREATE TABLE natures(
+  nature text NOT NULL PRIMARY KEY,
+  boosted text NOT NULL,
+  lowered text NOT NULL
 );
 
 -- copy from existing CSVs generated from the top cut explorer...

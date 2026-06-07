@@ -22,7 +22,15 @@
                 Tera Type: {{ pokemon.teratype.teratype }}<br>
               {% endif %}
               {% if pokemon.nature != None %}
-                {{ pokemon.nature.nature }} Nature<br>
+                {{ pokemon.nature.nature }}
+                <span class='nature-bonus'>
+                  {% if pokemon.nature.stats.boosted != None %}
+                    (+{{pokemon.nature.stats.boosted}}, -{{pokemon.nature.stats.lowered}})
+                  {% else %}
+                    (No effect)
+                  {% endif %}
+                </span>
+                Nature<br>
               {% endif %}
               {% for move in pokemon.moves %}
                 - {{move.move}}<br>

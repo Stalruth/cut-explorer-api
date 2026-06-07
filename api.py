@@ -13,7 +13,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload, Session
 
 import megas
-from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures
+from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures, Natures
 
 app = Flask(__name__)
 
@@ -23,10 +23,9 @@ with open('icondata.json', 'r') as infile:
     icon_data = json.load(infile)
 
 
-@app.template_filter('setIcon')
-def set_icon(pokemon):
+def get_pokemon_icon(pokemon):
     toID = re.compile('[^a-z0-9]')
-    species_id = toID.sub('', pokemon.species.lower())
+    species_id = toID.sub('', pokemon.lower())
 
     if species_id in icon_data['pokemon']:
         icon_info = icon_data['pokemon'][species_id]
@@ -43,7 +42,29 @@ def set_icon(pokemon):
     top = -math.floor(num / 12) * 30
     left = -(num % 12) * 40
 
-    return Markup(f'<span title="{pokemon.species}" style="background-position: {left}px {top}px" class="set-icon"></span>')
+    return (left, top)
+
+
+def get_item_icon(item):
+    toID = re.compile('[^a-z0-9]')
+    item_id = toID.sub('', item.lower())
+
+    index = 0
+    if item_id in icon_data['items']:
+        index = icon_data['items'][item_id]
+
+    top = -(index // 16) * 24
+    left = -(index % 16) * 24
+
+    return (left, top)
+
+
+@app.template_filter('setIcon')
+def set_icon(pokemon):
+    species_xy = get_pokemon_icon(pokemon.species)
+    item_xy = get_item_icon(pokemon.item)
+
+    return Markup(f'<span title="{pokemon.species}" style="background-position: {species_xy[0]}px {species_xy[1]}px" class="set-icon"><span title="{pokemon.item}" style="background-position: {item_xy[0]}px {item_xy[1]}px" class="item-icon"></span></span>')
 
 
 @app.errorhandler(404)
@@ -67,7 +88,8 @@ def paste_page(paste):
                        .options(joinedload(Team.pokemon)
                                 .joinedload(TeamPokemon.teratype))
                        .options(joinedload(Team.pokemon)
-                                .joinedload(TeamPokemon.nature))
+                                .joinedload(TeamPokemon.nature)
+                                .joinedload(PokemonNatures.stats))
                        .options(joinedload(Team.tour))
                        )
         result = session.execute(paste_query).unique().one().Team
