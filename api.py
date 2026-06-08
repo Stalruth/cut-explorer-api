@@ -156,17 +156,16 @@ def years():
 def season(year):
     months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
               7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
-    resp = make_response()
     result = {
             'season': f'{year}',
             'formats': []
     }
+    last_modified = None
     with Session(engine) as session:
         last_query = select(func.max(Tournament.last_modified)).where(Tournament.season == year)
         last_modified = session.execute(last_query).scalars().first().replace(tzinfo=ZoneInfo('UTC'))
         if request.if_modified_since is not None and request.if_modified_since > last_modified:
             resp = make_response('', 304)
-            resp.last_modified = last_modified
             return resp
         formats_query = select(SeasonFormat, Format).join(SeasonFormat.format).where(SeasonFormat.season == year).order_by(SeasonFormat.start_date)
         rows = session.execute(formats_query)
@@ -191,7 +190,9 @@ def season(year):
                 },
                 'tournaments': tournaments
             })
-    return result
+    resp = make_response(result, 200)
+    resp.last_modified = last_modified
+    return resp
 
 
 @app.route('/tournaments/current-year.json')
@@ -269,7 +270,6 @@ def tournament(year, slug):
         last_modified = tour.last_modified.replace(tzinfo=ZoneInfo('UTC'))
         if request.if_modified_since is not None and request.if_modified_since > last_modified:
             resp = make_response('', 304)
-            resp.last_modified = last_modified
             return resp
 
         result['name'] = tour.name if tour.name.startswith(f'{tour.season}') else f'{tour.season} {tour.name}'
