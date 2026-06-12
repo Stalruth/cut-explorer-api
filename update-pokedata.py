@@ -126,6 +126,12 @@ with Session(engine) as session:
                     teratype.pokemon = new_mon
                     session.add(teratype)
 
+                if tournament.season_format.format.open_natures:
+                    nature = PokemonNatures()
+                    nature.nature = pokemon['nature']
+                    nature.pokemon = new_mon
+                    session.add(nature)
+
     session.commit()
     print('Done!')
 

@@ -5,6 +5,12 @@ import requests
 from formes import formes
 
 
+def get_reportworm(season, slug):
+    url = f'https://standings.reportworm.com/api/v1/{season}/{slug}'
+    response = requests.get(url)
+    return json.loads(response.text)
+
+
 def get_pokedata(tour_id):
     if len(tour_id) < 10:
         url = f'https://pokedata.ovh/standingsVGC/{tour_id}/masters/{tour_id}_Masters.json'
@@ -78,6 +84,18 @@ def is_day2(player, points):
             player['record']['ties']) >= points and player['placing'] != 9999
 
 
+def remove_cut_reportworm(wins, losses, ties, last_result, swiss):
+    total_rounds = wins + losses + ties
+    played_cut_rounds = total_rounds - swiss
+    print(total_rounds, played_cut_rounds)
+    if played_cut_rounds < 0:
+        return (wins, losses, ties)
+    if last_result == 'W':
+        return (wins - played_cut_rounds, losses, ties)
+    else:
+        return (wins - played_cut_rounds + 1, losses - 1, ties)
+
+
 def remove_cut(player, swiss):
     record = player['record']
     total_rounds = record['wins'] + record['losses'] + record['ties']
@@ -131,10 +149,16 @@ def pokemon_validator(pokemon_in):
     pokemon = {
             'species': formes.get(pokemon_in['name'], pokemon_in['name']),
             'item': pokemon_in['item'],
-            'teraType': pokemon_in['teratype'],
+            'nature': pokemon_in.get('nature', pokemon_in.get('stat_alignment', None)),
+            'teraType': pokemon_in.get('tera', pokemon_in.get('teratype', None)),
             'ability': pokemon_in['ability'],
-            'moves': [move for move in pokemon_in['badges']]
+            'moves': [move for move in (pokemon_in.get('moves', pokemon_in.get('badges', [])))]
     }
+
+    # Nature Correction
+    if pokemon['nature'] == 'Naïve':
+        pokemon['nature'] = 'Naive'
+
     # Pokemon Specific Jank
     # TODO: test
 
