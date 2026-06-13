@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{{team.name}}'s {{team.tour.name}} Open Team List</title>
+    <title>{{ team | title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/static/mvp.css">
     <link rel="stylesheet" href="/static/app.css">
+    <meta property="og:title" content="{{ team | title }}" />
+    <meta property="og:url" content="https://pastes.cut-explorer.stalruth.dev/{{team.id}}" />
+    <meta property="og:description" content="{{team.name}}'s Open List from the {{team.tour.name}} featuring {{team.pokemon | listSpecies}}" />
   </head>
   <body>
     <main>

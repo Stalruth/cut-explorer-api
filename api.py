@@ -67,6 +67,15 @@ def set_icon(pokemon):
     return Markup(f'<span title="{pokemon.species}" style="background-position: {species_xy[0]}px {species_xy[1]}px" class="set-icon"><span title="{pokemon.item}" style="background-position: {item_xy[0]}px {item_xy[1]}px" class="item-icon"></span></span>')
 
 
+@app.template_filter('title')
+def get_title(team):
+    return f"{team.name}'s {team.tour.name} Open Team List"
+
+@app.template_filter('listSpecies')
+def list_species(pokemon):
+    return ', '.join([mon.species for mon in pokemon[:-1]]) + ', and ' + pokemon[-1].species
+
+
 @app.errorhandler(404)
 def error_404(err):
     return {'error': 'File not found.'}, 404
