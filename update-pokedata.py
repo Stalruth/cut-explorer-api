@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.orm import joinedload, Session
 
-from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves
+from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves, PokemonNatures
 from tour_helpers import get_pokedata, get_swiss_rounds, remove_country, remove_cut, pokemon_validator, populate_counts
 
 
