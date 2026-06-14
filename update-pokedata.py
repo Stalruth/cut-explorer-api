@@ -129,7 +129,7 @@ with Session(engine) as session:
 
                 if tournament.season_format.format.open_natures:
                     nature = PokemonNatures()
-                    nature.nature = pokemon['nature']
+                    nature.nature = valid['nature']
                     nature.pokemon = new_mon
                     session.add(nature)
 
