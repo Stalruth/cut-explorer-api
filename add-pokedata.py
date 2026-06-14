@@ -6,7 +6,7 @@ import re
 
 import requests
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload, Session
 
 from models import get_engine, Format, SeasonFormat, Tournament, Team, TeamPokemon, PokemonTeratypes, PokemonMoves
@@ -63,6 +63,8 @@ with Session(engine) as session:
     (new_tour.kicker, new_tour.day2, new_tour.cut) = populate_counts(pokedata)
     swiss_day1, swiss_day2 = get_swiss_rounds(len(pokedata))
     swiss = swiss_day1 + swiss_day2
+
+    new_tour.last_modified = func.now()
 
     session.add(new_tour)
 

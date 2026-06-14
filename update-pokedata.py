@@ -6,7 +6,7 @@ import re
 
 import requests
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.orm import joinedload, Session
 
@@ -32,6 +32,7 @@ with Session(engine) as session:
         tour_select = first_id
     tour_query = select(Tournament).where(Tournament.id == int(tour_select))
     tournament = session.execute(tour_query).one().Tournament
+    tournament.last_modified = func.now()
 
     pokedata_id = input('Enter the Pokedata ID: ')
     pokedata = get_pokedata(pokedata_id)
