@@ -261,6 +261,55 @@ def convert_set(pokemon, tour_format):
     return pokemon_out
 
 
+def get_teams(session, tour, bounds):
+    tour_format = tour.season_format.format
+    teams_query = (select(Team)
+                   .where(Team.tour_id == tour.id)
+                   .options(joinedload(Team.pokemon)
+                            .joinedload(TeamPokemon.moves))
+                   .order_by(Team.place)
+                   )
+
+    if bounds[0] is not None:
+        teams_query = teams_query.where(Team.place > bounds[0])
+
+    if bounds[1] is not None:
+        teams_query = teams_query.where((Team.place == None) | (Team.place <= bounds[1]))
+
+    if tour_format.terastal:
+        teams_query = (teams_query
+                       .options(joinedload(Team.pokemon)
+                                .joinedload(TeamPokemon.teratype))
+                       )
+
+    if tour_format.open_natures:
+        teams_query = (teams_query
+                       .options(joinedload(Team.pokemon)
+                                .joinedload(TeamPokemon.nature))
+                       )
+
+    rows = session.execute(teams_query).unique()
+    teams = []
+    for row in rows:
+        row_result = {
+                'name': row.Team.name,
+                'id': row.Team.id,
+                'swiss': {
+                    'wins': row.Team.wins,
+                    'losses': row.Team.losses,
+                    'place': row.Team.place
+                },
+        }
+        if row.Team.top:
+            row_result['top'] = row.Team.top
+        if row.Team.ties:
+            row_result['swiss']['ties'] = row.Team.ties
+        row_result['team'] = [convert_set(pokemon, tour_format) for pokemon in row.Team.pokemon]
+
+        teams.append(row_result)
+    return teams
+
+
 @app.route('/tournaments/<int:year>/<slug>.json')
 def tournament(year, slug):
     result = {
@@ -313,45 +362,38 @@ def tournament(year, slug):
             stages.append(stage)
 
         result['stages'] = sorted(stages, key=lambda stage: stage['count'])[::-1]
-        result['stages'][0].pop('count', None)
 
-        teams_query = (select(Team)
-                       .where(Team.tour_id == tour.id)
-                       .options(joinedload(Team.pokemon)
-                                .joinedload(TeamPokemon.moves))
-                       .order_by(Team.place)
-                       )
+        cutoff = tour.kicker
+        if tour.day2 is not None:
+            cutoff = tour.day2
+        result['teams'] = get_teams(session, tour, (None, cutoff))
 
-        if tour_format.terastal:
-            teams_query = (teams_query
-                           .options(joinedload(Team.pokemon)
-                                    .joinedload(TeamPokemon.teratype))
-                           )
 
-        if tour_format.open_natures:
-            teams_query = (teams_query
-                           .options(joinedload(Team.pokemon)
-                                    .joinedload(TeamPokemon.nature))
-                           )
+    resp = make_response(result)
+    resp.last_modified = last_modified
+    return resp
 
-        rows = session.execute(teams_query).unique()
-        for row in rows:
-            row_result = {
-                    'name': row.Team.name,
-                    'id': row.Team.id,
-                    'swiss': {
-                        'wins': row.Team.wins,
-                        'losses': row.Team.losses,
-                        'place': row.Team.place
-                    },
-            }
-            if row.Team.top:
-                row_result['top'] = row.Team.top
-            if row.Team.ties:
-                row_result['swiss']['ties'] = row.Team.ties
-            row_result['team'] = [convert_set(pokemon, tour_format) for pokemon in row.Team.pokemon]
+@app.route('/tournaments/<int:year>/<slug>.rest.json')
+def get_last_teams(year, slug):
+    last_modified = None
+    with Session(engine) as session:
+        tour_query = (select(Tournament)
+                      .where(Tournament.season == year)
+                      .where(Tournament.slug == slug)
+                      .options(joinedload(Tournament.season_format)
+                               .joinedload(SeasonFormat.format))
+                      )
+        tour = session.execute(tour_query).one().Tournament
 
-            result['teams'].append(row_result)
+        last_modified = tour.last_modified.replace(tzinfo=ZoneInfo('UTC'))
+        if request.if_modified_since is not None and request.if_modified_since > last_modified:
+            resp = make_response('', 304)
+            return resp
+
+        if tour.day2 is None:
+            abort(404)
+
+        result = get_teams(session, tour, (tour.day2, None))
 
     resp = make_response(result)
     resp.last_modified = last_modified
