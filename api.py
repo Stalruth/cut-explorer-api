@@ -163,8 +163,6 @@ def years():
 # TODO: look at this again, we have the relationships set up
 @app.route('/tournaments/<int:year>/tournaments.json')
 def season(year):
-    months = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
-              7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
     result = {
             'season': f'{year}',
             'formats': []
@@ -189,12 +187,12 @@ def season(year):
                 'name': row.Format.name,
                 'start': {
                     'day': row.SeasonFormat.start_date.day,
-                    'month': months[row.SeasonFormat.start_date.month],
+                    'month': row.SeasonFormat.start_date.month,
                     'year': row.SeasonFormat.start_date.year
                 },
                 'end': {
                     'day': row.SeasonFormat.end_date.day,
-                    'month': months[row.SeasonFormat.end_date.month],
+                    'month': row.SeasonFormat.end_date.month,
                     'year': row.SeasonFormat.end_date.year
                 },
                 'tournaments': tournaments
